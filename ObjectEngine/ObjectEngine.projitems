@@ -1,0 +1,19 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <MSBuildAllProjects Condition="'$(MSBuildVersion)' == '' Or '$(MSBuildVersion)' &lt; '16.0'">$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+    <HasSharedItems>true</HasSharedItems>
+    <SharedGUID>78c873ef-9dd5-42bd-af8a-7f1181461f6a</SharedGUID>
+  </PropertyGroup>
+  <PropertyGroup Label="Configuration">
+    <Import_RootNamespace>ObjectEngine</Import_RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)objectFactory\ObjectFactory.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)objectPipelines\objectConverters\JSON.IO\IObjectSerializer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)objectPipelines\objectConverters\JSON.IO\ObjectSerializer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)objectPipelines\objectConverters\JSON.IO\SerializationAttributes\ObjectSerializingAttributes.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)objectPipelines\objectManagement\IObjManager.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)objectPipelines\objectManagement\ObjManager.cs" />
+  </ItemGroup>
+</Project>

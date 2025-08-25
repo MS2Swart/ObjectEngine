@@ -1,0 +1,36 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.14.36327.8
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "ObjectEngine", "ObjectEngine\ObjectEngine.shproj", "{78C873EF-9DD5-42BD-AF8A-7F1181461F6A}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Packages", "Packages", "{02EA681E-C7D8-13C7-8484-4AC65E1B71E8}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OECore", "OECore\OECore.csproj", "{1865A564-FEED-458A-A1A5-C96F3B785B96}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{1865A564-FEED-458A-A1A5-C96F3B785B96}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1865A564-FEED-458A-A1A5-C96F3B785B96}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1865A564-FEED-458A-A1A5-C96F3B785B96}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1865A564-FEED-458A-A1A5-C96F3B785B96}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{1865A564-FEED-458A-A1A5-C96F3B785B96} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {5F5285FB-F7DA-435E-B990-537344A466AF}
+	EndGlobalSection
+	GlobalSection(SharedMSBuildProjectFiles) = preSolution
+		ObjectEngine\ObjectEngine.projitems*{1865a564-feed-458a-a1a5-c96f3b785b96}*SharedItemsImports = 5
+		ObjectEngine\ObjectEngine.projitems*{78c873ef-9dd5-42bd-af8a-7f1181461f6a}*SharedItemsImports = 13
+	EndGlobalSection
+EndGlobal
