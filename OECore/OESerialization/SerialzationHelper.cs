@@ -7,9 +7,9 @@ namespace OECore.OESerialization
     /// Helps Chain Object Serializer Methods
     /// </summary>
     /// <remarks>Requires an ObjManager<T> Management Class, Previously ObjectManager<T>, changed due to .NET Conflictions.</remarks>
-    /// <typeparam name="T"></typeparam>
+    /// <typeparam name="TObject"></typeparam>
     /// <param name="objectManager"></param>
-    public class SerializationHelper<T>(ObjManager<T> objectManager) : ObjectSerializer<T>(objectManager), ISerializeObjects<T>, ISubmitObjectSerializers<T> where T : class, new()
+    public class SerializationHelper<TObject>(ObjManager<TObject> objectManager) : ObjectSerializer<TObject>(objectManager), ISerializeObjects<TObject>, ISubmitObjectSerializers<TObject> where TObject : class, new()
     {
         #region Serialization Method Chains.
 
@@ -17,7 +17,7 @@ namespace OECore.OESerialization
         /// Serializes the current object and returns the instance for method chaining.
         /// </summary>
         /// <returns></returns>
-        public SerializationHelper<T> SerializeObject()
+        public SerializationHelper<TObject> SerializeObject()
         {
             Serialize();
             return this;
@@ -25,7 +25,7 @@ namespace OECore.OESerialization
         /// <summary>
         /// Deserializes the specified JSON string and associates it with the given identifier.
         /// </summary>
-        public SerializationHelper<T> DeserializeObject(Guid Id,string json)
+        public SerializationHelper<TObject> DeserializeObject(Guid Id,string json)
         {
             Deserialize(Id,json);
             return this;
@@ -33,7 +33,7 @@ namespace OECore.OESerialization
         /// <summary>
         /// Submits the current serializable object for processing and returns the current instance.
         /// </summary>
-        public SerializationHelper<T> SubmitSerializableObject()
+        public SerializationHelper<TObject> SubmitSerializableObject()
         {
             SubmitSerializable();
             return this;
@@ -41,7 +41,7 @@ namespace OECore.OESerialization
         /// <summary>
         /// Submits the current object for deserialization and returns the instance for method chaining.
         /// </summary>
-        public SerializationHelper<T> SubmitDeserializableObject()
+        public SerializationHelper<TObject> SubmitDeserializableObject()
         {
             SubmitDeserializable();
             return this;

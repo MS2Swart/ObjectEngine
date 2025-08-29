@@ -9,6 +9,7 @@
     <Import_RootNamespace>ObjectEngine</Import_RootNamespace>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)objectFactory\IObjectFactory.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)objectFactory\ObjectFactory.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)objectPipelines\objectConverters\JSON.IO\IObjectSerializer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)objectPipelines\objectConverters\JSON.IO\ObjectSerializer.cs" />

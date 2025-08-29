@@ -3,36 +3,52 @@
 namespace ObjectEngine.objectPipelines.objectManager
 {
     /// <summary>
-    /// ICreate Method Contract: Create ObjectCreate instance\instances.
+    /// IMange Method Contract: Manage System Object instance\instances
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    internal interface ICreate<T> where T : class,new()
+    internal interface IManage<TObject> where TObject : class, new() 
     {
-        ObjManager<T> Create();
+        ObjManager<TObject> Submit();
+        ObjManager<TObject> Remove(Guid ObjectID);
+        ObjManager<TObject> Clear(ObjectSerializer<TObject>? Serializer = null);
+
+        #region InitialCreationController
+
+        /// <summary>
+        /// Enumerates and yield returns created object type
+        /// </summary>
+        /// <remarks>Enumerator used for personal engine design prefrence.</remarks>
+        /// <param name="createdObject"></param>
+        /// <returns>IEenumerator<T></returns>
+        private protected static IEnumerator<object> InitialCreationController(object createdObject)
+        {
+            yield return createdObject;
+        }
+        #endregion
+
+        #region InitialCreationRunner
+        /// <summary>
+        /// Enumerable and yield current Constroller object.
+        /// </summary>
+        /// <remarks>Enumerable userd for personal engine design prefrence</remarks>
+        /// <param name="createdObject"></param>
+        /// <returns>IEnumerable<object></returns>
+        private protected static IEnumerable<object> InitialCreationRunner(object createdObject)
+        {
+            using (var Controller = InitialCreationController(createdObject))
+            {
+                while (Controller.MoveNext())
+                {
+                    if (Controller.Current is not null)
+                    {
+                        yield return Controller.Current;
+                    }
+                }
+            }
+            yield break;
+        }
+
+        #endregion
     }
-    /// <summary>
-    /// IRemove Method Contract: Remove ObjectCreate instance\instances
-    /// </summary>
-    /// <typeparam name="T"></typeparam>
-    internal interface IRemove<T> where T : class, new() 
-    {
-        ObjManager<T> Remove(Guid ObjectID);
-        ObjManager<T> Clear(ObjectSerializer<T>? Serializer = null);
-    }
-    /// <summary>
-    /// ISubmit Method Contract: Submits Objects to a ConcurentQueue
-    /// </summary>
-    /// <typeparam name="T"></typeparam>
-    internal interface ISubmit<T> where T : class, new() 
-    {
-        ObjManager<T> Submit();
-    }
-    /// <summary>
-    /// IEdit Method Contract: Edits the Object before submiting to Queue
-    /// </summary>
-    /// <typeparam name="T"></typeparam>
-    internal interface IEdit<T> where T : class,new()
-    {
-        ObjManager<T> Edit(Guid id, object newObject);
-    }
+
 }

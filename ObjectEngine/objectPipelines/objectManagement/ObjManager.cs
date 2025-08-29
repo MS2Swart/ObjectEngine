@@ -8,49 +8,11 @@ namespace ObjectEngine.objectPipelines.objectManager
     /// Object Manager shotend to ObjManager due to .Net alias conflictions, provides Object collections patterns and a Queue for Object Control flow.
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    public class ObjManager<T> : ObjectFactory, ICreate<T>,IRemove<T>,ISubmit<T> where T : class, new()
+    public class ObjManager<TObject> : ObjectFactory,IManage<TObject> where TObject : class, new()
     {
         public ConcurrentQueue<(Guid Id,object CreatedObject, bool Success)> QUEUED_OBJECTS = new();
         private readonly ConcurrentDictionary<Guid, (object CreatedObject, bool Success)> PASSED_OBJECTS = new();
         private readonly ConcurrentDictionary<Guid, (object? CreatedObject, bool Failed)> FAILED_OBJECTS = new();
-
-        #region InitialCreationController
-
-        /// <summary>
-        /// Enumerates and yield returns created object type
-        /// </summary>
-        /// <remarks>Enumerator used for personal engine design prefrence.</remarks>
-        /// <param name="createdObject"></param>
-        /// <returns>IEenumerator<T></returns>
-        private static IEnumerator<object> InitialCreationController(object createdObject)
-        {
-            yield return createdObject;
-        }
-        #endregion
-
-        #region InitialCreationRunner
-        /// <summary>
-        /// Enumerable and yield current Constroller object.
-        /// </summary>
-        /// <remarks>Enumerable userd for personal engine design prefrence</remarks>
-        /// <param name="createdObject"></param>
-        /// <returns>IEnumerable<object></returns>
-        private static IEnumerable<object> InitialCreationRunner(object createdObject)
-        {
-            using (var Controller = InitialCreationController(createdObject))
-            {
-                while (Controller.MoveNext())
-                {
-                    if (Controller.Current is not null)
-                    {
-                        yield return Controller.Current;
-                    }
-                }
-            }
-            yield break;
-        }
-
-        #endregion
 
         #region CreationChain
 
@@ -58,9 +20,9 @@ namespace ObjectEngine.objectPipelines.objectManager
         /// Creates an object That will be added to Either a PassedObject or FailedObject Dictionary
         /// </summary>
         /// <returns>ObjManager<T></returns>
-        public ObjManager<T> Create()
+        public ObjManager<TObject> Create()
         {
-                foreach (var OBJECT_INSTANCE in InitialCreationRunner(CreateObject(CreateType<T>())))
+                foreach (var OBJECT_INSTANCE in IManage<TObject>.InitialCreationRunner(ICreate.SystemObject<TObject>(ICreate.SystemType<TObject>())))
                 {
                     var (Id, CreatedObject, Success) = AddObjectToDictionary(OBJECT_INSTANCE);
                     if (Success == true && CreatedObject is not null)
@@ -86,7 +48,7 @@ namespace ObjectEngine.objectPipelines.objectManager
         /// <returns>ObjManager<T></returns>
         /// <exception cref="ArgumentException"></exception>
         /// <exception cref="InvalidDataException"></exception>
-        public ObjManager<T> Remove(Guid objectId)
+        public ObjManager<TObject> Remove(Guid objectId)
         {
             if (PASSED_OBJECTS.TryRemove(objectId, out var removed))
             {
@@ -104,7 +66,7 @@ namespace ObjectEngine.objectPipelines.objectManager
         /// </summary>
         /// <returns>ObjManager<T></returns>
         /// <exception cref="OperationCanceledException"></exception>
-        public ObjManager<T> Clear(ObjectSerializer<T>? Serializer = null)
+        public ObjManager<TObject> Clear(ObjectSerializer<TObject>? Serializer = null)
         {
             try
             {
@@ -114,7 +76,7 @@ namespace ObjectEngine.objectPipelines.objectManager
                     Serializer.SERIALIZED_QUEUED.Clear();
                     Serializer.DESERIALIZED_QUEUED.Clear();
                 }
-                Console.WriteLine($"Object Manager Cleared: Collection Pool for source: {typeof(T).Name}");
+                Console.WriteLine($"Object Manager Cleared: Collection Pool for source: {typeof(TObject).Name}");
             }
             catch (Exception ex)
             {
@@ -132,7 +94,7 @@ namespace ObjectEngine.objectPipelines.objectManager
         /// </summary>
         /// <returns>ObjManager<T></returns>
         /// <exception cref="Exception"></exception>
-        public ObjManager<T> Submit() 
+        public ObjManager<TObject> Submit() 
         {
             if (!FAILED_OBJECTS.IsEmpty)
             {
@@ -146,7 +108,7 @@ namespace ObjectEngine.objectPipelines.objectManager
                 {
                     Console.WriteLine($"Object Manager: Removed QUEUED object {Result.CreatedObject.GetType().Name} from Queued passed objects.");
                 }
-                Console.WriteLine($"Object Manager: QUEUED_OBJECTS Added, Source: {typeof(T)}");
+                Console.WriteLine($"Object Manager: QUEUED_OBJECTS Added, Source: {typeof(TObject)}");
             }
 
             return this;
