@@ -1,7 +1,5 @@
-﻿using ObjectEngine.objectPipelines.objectConverters.JSON.IO.SerializationAttributes;
-using ObjectEngine.objectPipelines.objectManager;
+﻿using ObjectEngine.objectPipelines.objectManager;
 using System.Collections.Concurrent;
-using System.Reflection;
 using System.Runtime.Serialization;
 using System.Text.Json;
 
@@ -12,7 +10,7 @@ namespace ObjectEngine.objectPipelines.objectConverters.JSON.IO
     /// </summary>
     /// <typeparam name="T"></typeparam>
     /// <param name="objectManager"></param>
-    public class ObjectSerializer<TObject>(ObjManager<TObject> objectManager) : ISerialize<TObject>,ISubmitSerializers<TObject>,ISerializableIterator where TObject : class, new()
+    public class ObjectSerializer<TObject>(ObjManager<TObject> objectManager) : ISerializableIterator where TObject : class, new()
     {
         public ConcurrentQueue<(Guid Id,string SerializedObject)> SERIALIZED_QUEUED = new();
         public ConcurrentQueue<(Guid Id, object DeserializedObject)> DESERIALIZED_QUEUED = new();
@@ -26,7 +24,7 @@ namespace ObjectEngine.objectPipelines.objectConverters.JSON.IO
         /// <remarks>This Chain Method will receive an expression tree for diffrent Serialization Format if needed.</remarks>
         /// <returns></returns>
         /// <exception cref="SerializationException"></exception>
-        public ObjectSerializer<TObject> Serialize()
+        private protected ObjectSerializer<TObject> Serialize()
         {
             try
             {
@@ -51,12 +49,12 @@ namespace ObjectEngine.objectPipelines.objectConverters.JSON.IO
         /// <returns></returns>
         /// <exception cref="IOException"></exception>
         /// <exception cref="SerializationException"></exception>
-        public ObjectSerializer<TObject> Deserialize(Guid Id,string FORMATDATA)
+        private protected ObjectSerializer<TObject> Deserialize(Guid Id,string FORMATDATA)
         {
             try
             {
 
-                    var deserialized = JsonSerializer.Deserialize<object>(FORMATDATA)
+                    var deserialized = JsonSerializer.Deserialize<TObject>(FORMATDATA)
                         ?? throw new IOException("Could not deserialize FORMAT_DATA to type T.");
                     DESERIALIZED_READY.TryAdd(Id, deserialized!);
                     Console.WriteLine($"[Deserialize] Id={Id} Type={typeof(TObject).Name} Obj={deserialized}");
@@ -72,7 +70,7 @@ namespace ObjectEngine.objectPipelines.objectConverters.JSON.IO
         /// Submits Ready Available Serializable Format Objects to a serialized Queue.
         /// </summary>
         /// <returns></returns>
-        public ObjectSerializer<TObject> SubmitSerializable() 
+        private protected ObjectSerializer<TObject> SubmitSerializable() 
         {
             foreach (var serializable in SERIALIZED_READY)
             {
@@ -85,13 +83,22 @@ namespace ObjectEngine.objectPipelines.objectConverters.JSON.IO
         /// Submits a Ready Available Deserialized FORMATDATA to be deserialized as C# System Type.
         /// </summary>
         /// <returns></returns>
-        public ObjectSerializer<TObject> SubmitDeserializable() 
+        private protected ObjectSerializer<TObject> SubmitDeserializable() 
         {
             foreach (var deserializable in DESERIALIZED_READY)
             {
                 DESERIALIZED_QUEUED.Enqueue((deserializable.Key, deserializable.Value));
                 Console.WriteLine($"Deserialized Object Submited Id {deserializable.Key} Object: {deserializable.Value}");
             }
+            return this;
+        }
+        /// <summary>
+        /// Clears All Object Serializer Collections
+        /// </summary>
+        /// <returns></returns>
+        private protected ObjectSerializer<TObject> ClearSerializer()
+        {
+            SERIALIZED_READY.Clear();DESERIALIZED_READY.Clear(); SERIALIZED_QUEUED.Clear();DESERIALIZED_QUEUED.Clear();
             return this;
         }
     }

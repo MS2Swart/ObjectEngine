@@ -8,10 +8,6 @@ namespace ObjectEngine.objectPipelines.objectManager
     /// <typeparam name="T"></typeparam>
     internal interface IManage<TObject> where TObject : class, new() 
     {
-        ObjManager<TObject> Submit();
-        ObjManager<TObject> Remove(Guid ObjectID);
-        ObjManager<TObject> Clear(ObjectSerializer<TObject>? Serializer = null);
-
         #region InitialCreationController
 
         /// <summary>

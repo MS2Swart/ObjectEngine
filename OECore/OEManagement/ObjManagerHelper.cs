@@ -2,18 +2,19 @@
 
 namespace OECore.OEManagement
 {
-    public class ManagerHelper<TObject> : ObjManager<TObject>,IManageObjects<TObject> where TObject : class,new()
+    public class ObjManagerHelper<TObject> : ObjManager<TObject>,IManageObjects<TObject> where TObject : class,new()
     {
         #region MethodChain:CreateObject
-        public ManagerHelper<TObject> CreateObject()
+        public ObjManagerHelper<TObject> CreateObject()
         {
+            
             Create();
             return this;
         }
         #endregion
         
         #region MethodChain:RemoveObject
-        public ManagerHelper<TObject> RemoveObject(Guid Id) 
+        public ObjManagerHelper<TObject> RemoveObject(Guid Id) 
         {
             Remove(Id);
             return this;
@@ -22,7 +23,7 @@ namespace OECore.OEManagement
         #endregion
 
         #region MethodChain:ClearObject
-        public ManagerHelper<TObject> ClearObject() 
+        public ObjManagerHelper<TObject> ClearObject() 
         {
             Clear();
             return this;
@@ -30,7 +31,7 @@ namespace OECore.OEManagement
         #endregion
 
         #region MethodChain:SubmitObject
-        public ManagerHelper<TObject> SubmitObject()
+        public ObjManagerHelper<TObject> SubmitObject()
         { 
             Submit();
             return this;

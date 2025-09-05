@@ -20,7 +20,7 @@ namespace ObjectEngine.objectPipelines.objectManager
         /// Creates an object That will be added to Either a PassedObject or FailedObject Dictionary
         /// </summary>
         /// <returns>ObjManager<T></returns>
-        public ObjManager<TObject> Create()
+        private protected ObjManager<TObject> Create()
         {
                 foreach (var OBJECT_INSTANCE in IManage<TObject>.InitialCreationRunner(ICreate.SystemObject<TObject>(ICreate.SystemType<TObject>())))
                 {
@@ -48,7 +48,7 @@ namespace ObjectEngine.objectPipelines.objectManager
         /// <returns>ObjManager<T></returns>
         /// <exception cref="ArgumentException"></exception>
         /// <exception cref="InvalidDataException"></exception>
-        public ObjManager<TObject> Remove(Guid objectId)
+        private protected ObjManager<TObject> Remove(Guid objectId)
         {
             if (PASSED_OBJECTS.TryRemove(objectId, out var removed))
             {
@@ -66,16 +66,11 @@ namespace ObjectEngine.objectPipelines.objectManager
         /// </summary>
         /// <returns>ObjManager<T></returns>
         /// <exception cref="OperationCanceledException"></exception>
-        public ObjManager<TObject> Clear(ObjectSerializer<TObject>? Serializer = null)
+        private protected ObjManager<TObject> Clear()
         {
             try
             {
                 PASSED_OBJECTS.Clear(); FAILED_OBJECTS.Clear(); QUEUED_OBJECTS.Clear(); ObjectDictionary.Clear();
-                if (Serializer is not null)
-                {
-                    Serializer.SERIALIZED_QUEUED.Clear();
-                    Serializer.DESERIALIZED_QUEUED.Clear();
-                }
                 Console.WriteLine($"Object Manager Cleared: Collection Pool for source: {typeof(TObject).Name}");
             }
             catch (Exception ex)
@@ -94,7 +89,7 @@ namespace ObjectEngine.objectPipelines.objectManager
         /// </summary>
         /// <returns>ObjManager<T></returns>
         /// <exception cref="Exception"></exception>
-        public ObjManager<TObject> Submit() 
+        private protected ObjManager<TObject> Submit() 
         {
             if (!FAILED_OBJECTS.IsEmpty)
             {
