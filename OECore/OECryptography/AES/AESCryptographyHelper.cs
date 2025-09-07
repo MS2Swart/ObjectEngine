@@ -7,7 +7,7 @@ using ObjectEngine.objectPipelines.objectConverters.CRYPTOGRAPHY.IO.AES;
 
 namespace OECore.OECryptography.AES
 {
-    public class AESCryptographyHelper<TObject>(ObjectSerializer<TObject> objectSerializer) : ObjectAESCryptographer where TObject : class ,new()
+    public class AESCryptographyHelper<TObject>(ObjectSerializer<TObject> objectSerializer) : ObjectAESCryptographer where TObject : class, new()
     {
         private static readonly ConcurrentBag<Aes> RESTRICTEDKEY = [];
         private protected ConcurrentDictionary<Guid, byte[]> ENCRYPTED_OBJECTS = new();
@@ -25,7 +25,7 @@ namespace OECore.OECryptography.AES
             foreach (var (Id, SerializedObject) in objectSerializer.SERIALIZED_QUEUED)
             {
                 var EncryptedObject = Encrypt(SerializedObject);
-                var EncryptedAdded = ENCRYPTED_OBJECTS.TryAdd(Id,(EncryptedObject));
+                var EncryptedAdded = ENCRYPTED_OBJECTS.TryAdd(Id,EncryptedObject);
                 if (EncryptedAdded)
                 {
                     Console.WriteLine("[ENCRYPTION_ADDED] TO [ENCRYPTED_OBJECTS]");
@@ -44,7 +44,7 @@ namespace OECore.OECryptography.AES
                     var DecryptionAdded = DECRYPTED_OBJECTS.TryAdd(EncryptedObject.Key,DecryptedObject);
                     if (DecryptionAdded)
                     {
-                        Console.WriteLine($"[ENCRYPTION_REMOVED] AND [DECRYPTION_ADDED] TO [DYCRYPED_OBJECTS],Result: {Result}");
+                        Console.WriteLine($"[ENCRYPTION_REMOVED] AND [DECRYPTION_ADDED] TO [DYCRYPED_OBJECTS],Result: {Result}: Source: {nameof(DecryptedObject)}");
                     }
                 }
             }

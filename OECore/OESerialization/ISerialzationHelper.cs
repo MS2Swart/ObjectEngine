@@ -9,7 +9,7 @@
     internal interface ISerializeObjects<TObject> where TObject : class, new()
     {
         SerializationHelper<TObject> SerializeObject();
-        SerializationHelper<TObject> DeserializeObject(Guid Id, string targetObject);
+        SerializationHelper<TObject> DeserializeObject();
     }
     /// <summary>
     /// ISubmitObjectSerializers Contracts: Provides Ready available collection Objects to Ready Available collection Queues.

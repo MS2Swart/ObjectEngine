@@ -11,6 +11,7 @@
   <ItemGroup>
     <Compile Include="$(MSBuildThisFileDirectory)objectFactory\IObjectFactory.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)objectFactory\ObjectFactory.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)objectPipelines\objectConverters\CRYPTOGRAPHY.IO\AES\Envelopes\AESEnvelope\ObjectAESEnvelope.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)objectPipelines\objectConverters\CRYPTOGRAPHY.IO\AES\IObjectAESCryptographer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)objectPipelines\objectConverters\CRYPTOGRAPHY.IO\AES\ObjectAESCryptographer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)objectPipelines\objectConverters\JSON.IO\IObjectSerializer.cs" />
@@ -18,5 +19,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)objectPipelines\objectConverters\JSON.IO\SerializationAttributes\ObjectSerializingAttributes.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)objectPipelines\objectManagement\IObjManager.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)objectPipelines\objectManagement\ObjManager.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)objectPipelines\objectObjectDevelopment\IObjectDeveloper.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)objectPipelines\objectObjectDevelopment\ObjectDeveloper.cs" />
   </ItemGroup>
 </Project>

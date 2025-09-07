@@ -1,5 +1,4 @@
 ﻿using ObjectEngine.objectFactory;
-using ObjectEngine.objectPipelines.objectConverters.JSON.IO;
 using System.Collections.Concurrent;
 
 namespace ObjectEngine.objectPipelines.objectManager
@@ -52,9 +51,7 @@ namespace ObjectEngine.objectPipelines.objectManager
         {
             if (PASSED_OBJECTS.TryRemove(objectId, out var removed))
             {
-                Console.WriteLine(
-                    $"Object Manager: Removed Id={objectId}, Obj={removed.CreatedObject}, Success={removed.Success}"
-                );
+                Console.WriteLine($"Object Manager: Removed Id={objectId}, Obj={removed.CreatedObject}, Success={removed.Success}");
                 return this;
             }
 

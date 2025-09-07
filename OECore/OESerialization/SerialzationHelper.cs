@@ -25,9 +25,12 @@ namespace OECore.OESerialization
         /// <summary>
         /// Deserializes the specified JSON string and associates it with the given identifier.
         /// </summary>
-        public SerializationHelper<TObject> DeserializeObject(Guid Id,string json)
+        public SerializationHelper<TObject> DeserializeObject()
         {
-            Deserialize(Id,json);
+            foreach (var (Id, SerializedObject) in SERIALIZED_QUEUED)
+            {
+                Deserialize(Id, SerializedObject);
+            }
             return this;
         }
         /// <summary>

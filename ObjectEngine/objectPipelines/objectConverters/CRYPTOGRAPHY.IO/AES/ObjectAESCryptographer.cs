@@ -9,7 +9,7 @@ namespace ObjectEngine.objectPipelines.objectConverters.CRYPTOGRAPHY.IO.AES
             var CreatedAes = IObjectAESCryptographer.CreateAesKey();
             return CreatedAes;
         }
-        private protected byte[] Encrypt(string plainText)
+        private protected static byte[] Encrypt(string plainText)
         {
             var EncryptedText = IObjectAESCryptographer.Encrypt(plainText);
             return EncryptedText;
