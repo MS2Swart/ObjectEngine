@@ -1,5 +1,6 @@
 ﻿using ObjectEngine.objectFactory;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 
 namespace ObjectEngine.objectPipelines.objectManager
 {
@@ -7,7 +8,7 @@ namespace ObjectEngine.objectPipelines.objectManager
     /// Object Manager shotend to ObjManager due to .Net alias conflictions, provides Object collections patterns and a Queue for Object Control flow.
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    public class ObjManager<TObject> : ObjectFactory,IManage<TObject> where TObject : class, new()
+    public class ObjManager<TObject> : ObjectFactory,IManage where TObject : class, new()
     {
         public ConcurrentQueue<(Guid Id,object CreatedObject, bool Success)> QUEUED_OBJECTS = new();
         private readonly ConcurrentDictionary<Guid, (object CreatedObject, bool Success)> PASSED_OBJECTS = new();
@@ -21,18 +22,23 @@ namespace ObjectEngine.objectPipelines.objectManager
         /// <returns>ObjManager<T></returns>
         private protected ObjManager<TObject> Create()
         {
-                foreach (var OBJECT_INSTANCE in IManage<TObject>.InitialCreationRunner(ICreate.SystemObject<TObject>(ICreate.SystemType<TObject>())))
-                {
-                    var (Id, CreatedObject, Success) = AddObjectToDictionary(OBJECT_INSTANCE);
-                    if (Success == true && CreatedObject is not null)
+
+                    (Guid Id, object CreatedObject, bool Success) OBJECT_INSTANCE_STORED = new();
+                    foreach (var OBJECT_INSTANCE in IManage.InitialCreationRunner(ICreate.SystemObject<TObject>(ICreate.SystemType<TObject>())))
                     {
-                        PASSED_OBJECTS.TryAdd(Id, (CreatedObject, Success));
+                        var (Id, CreatedObject, Success) = AddObjectToDictionary(OBJECT_INSTANCE);
+                        if (Success == true && CreatedObject is not null)
+                        {
+                            OBJECT_INSTANCE_STORED = (Id, CreatedObject, Success);
+                            var OBJECT_INSTANCE_STORED_TRASFORM = KeyValuePair.Create(OBJECT_INSTANCE_STORED.Id, (OBJECT_INSTANCE_STORED.CreatedObject, OBJECT_INSTANCE_STORED.Success));
+                            PASSED_OBJECTS.TryAdd(OBJECT_INSTANCE_STORED_TRASFORM.Key, OBJECT_INSTANCE_STORED_TRASFORM.Value);
+                        }
+                        else
+                        {
+                            FAILED_OBJECTS.TryAdd(Id, (CreatedObject, Success));
+                        }
+
                     }
-                    else
-                    {
-                        FAILED_OBJECTS.TryAdd(Id, (CreatedObject, Success));
-                    }
-                }
             return this;
         }
 

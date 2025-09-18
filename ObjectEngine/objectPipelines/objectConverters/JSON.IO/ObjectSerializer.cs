@@ -10,13 +10,17 @@ namespace ObjectEngine.objectPipelines.objectConverters.JSON.IO
     /// </summary>
     /// <typeparam name="T"></typeparam>
     /// <param name="objectManager"></param>
-    public class ObjectSerializer<TObject>(ObjManager<TObject> objectManager) : ISerializableIterator where TObject : class, new()
+    public class ObjectSerializer<TObject> : ISerializableIterator where TObject : class, new()
     {
         public ConcurrentQueue<(Guid Id,string SerializedObject)> SERIALIZED_QUEUED = new();
         public ConcurrentQueue<(Guid Id, object DeserializedObject)> DESERIALIZED_QUEUED = new();
         private readonly ConcurrentDictionary<Guid, string> SERIALIZED_READY = new();
         private readonly ConcurrentDictionary<Guid, object> DESERIALIZED_READY = new();
-        private readonly ObjManager<TObject> ObjManager = objectManager;
+        private readonly ObjManager<TObject> ObjManager;
+        public ObjectSerializer(ObjManager<TObject> objectManager)
+        {
+            ObjManager = objectManager;
+        }
 
         /// <summary>
         /// Serialize Object to serializeble Format
@@ -28,12 +32,11 @@ namespace ObjectEngine.objectPipelines.objectConverters.JSON.IO
         {
             try
             {
-                foreach (var (id, target) in ISerializableIterator.SerializableIterator(ObjManager))
-                {
-                    var serialized = JsonSerializer.Serialize((TObject)target);
-                    SERIALIZED_READY.TryAdd(id, serialized);
-                    Console.WriteLine($"[Serialize] Id={id} Type={typeof(TObject).Name} Json={serialized}");
-                }
+                Parallel.ForEach(ISerializableIterator.SerializableIterator(ObjManager), new ParallelOptions(){ MaxDegreeOfParallelism = Environment.ProcessorCount }, serializable => {
+                    var serialized = JsonSerializer.Serialize((TObject)serializable.TargetObject);
+                    SERIALIZED_READY.TryAdd(serializable.Id, serialized);
+                    Console.WriteLine($"[Serialize] Id={serializable.TargetObject} Type={typeof(TObject).Name} Json={serialized}");
+                });
             }
             catch (Exception ex)
             {

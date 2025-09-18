@@ -4,7 +4,7 @@
     /// IMange Method Contract: Manage System Object instance\instances
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    internal interface IManage<TObject> where TObject : class, new() 
+    internal interface IManage
     {
         #region InitialCreationController
 

@@ -1,8 +1,13 @@
 ﻿using ObjectEngine.objectPipelines.objectConverters.JSON.IO;
 using ObjectEngine.objectPipelines.objectManager;
+using ObjectEngine.objectPipelines.objectTreading;
+using OECore.OEManagement;
+using System.Net.Http.Headers;
+using System.Runtime.Serialization;
 
 namespace OECore.OESerialization
 {
+
     /// <summary>
     /// Helps Chain Object Serializer Methods
     /// </summary>
@@ -11,7 +16,9 @@ namespace OECore.OESerialization
     /// <param name="objectManager"></param>
     public class SerializationHelper<TObject>(ObjManager<TObject> objectManager) : ObjectSerializer<TObject>(objectManager), ISerializeObjects<TObject>, ISubmitObjectSerializers<TObject> where TObject : class, new()
     {
+
         #region Serialization Method Chains.
+
 
         /// <summary>
         /// Serializes the current object and returns the instance for method chaining.

@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace ObjectEngine.objectFactory
+﻿namespace ObjectEngine.objectFactory
 {
     public interface ICreate
     {

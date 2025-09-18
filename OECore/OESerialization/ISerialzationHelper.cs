@@ -1,4 +1,6 @@
-﻿namespace OECore.OESerialization
+﻿using ObjectEngine.objectPipelines.objectManager;
+
+namespace OECore.OESerialization
 {
     #region Object Engine Serialzation Helper Contracts
 

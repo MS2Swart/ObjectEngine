@@ -2,12 +2,11 @@
 
 namespace OECore.OEManagement
 {
-    public class ObjManagerHelper<TObject> : ObjManager<TObject>,IManageObjects<TObject> where TObject : class,new()
+    public class ObjManagerHelper<TObject> : ObjManager<TObject>,IManageObjects<TObject> where TObject : class, new()
     {
         #region MethodChain:CreateObject
         public ObjManagerHelper<TObject> CreateObject()
         {
-            
             Create();
             return this;
         }

@@ -1,4 +1,6 @@
-﻿namespace OECore.OEManagement
+﻿using ObjectEngine.objectPipelines.objectManager;
+
+namespace OECore.OEManagement
 {
     #region Object Engine Management Helper Contracts
 
