@@ -10,12 +10,27 @@ namespace OECore.OEManagement
             Create();
             return this;
         }
+        public ObjManagerHelper<TObject> CreateObject(Guid Id)
+        {
+            Create(Id);
+            return this;
+        }
         #endregion
-        
+
         #region MethodChain:RemoveObject
         public ObjManagerHelper<TObject> RemoveObject(Guid Id) 
         {
             Remove(Id);
+            return this;
+        }
+
+        #endregion
+
+        #region MethodChain:UpdateObject
+
+        public ObjManagerHelper<TObject> UpdateObject(Guid Id,object TargetObject)
+        {
+            Update(Id, TargetObject);
             return this;
         }
 

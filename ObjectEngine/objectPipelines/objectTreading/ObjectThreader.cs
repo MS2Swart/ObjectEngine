@@ -1,13 +1,15 @@
 ﻿using ObjectEngine.objectPipelines.objectManager;
 using System.Collections.Concurrent;
+using System.Threading;
 
 
 namespace ObjectEngine.objectPipelines.objectTreading
 {
-    internal class ObjectThreader<TObject> : IWrapObjects<TObject> where TObject : class, new()
+    public class ObjectThreader<TObject>(int ConcurrentTaskLimit) : IWrapObjects<TObject> where TObject : class, new()
     {
         public delegate Task<TObject> Payload();
-        private readonly SemaphoreSlim _semaphore = new(5); // Limit to 5 concurrent tasks, adjust as needed
+        private readonly SemaphoreSlim _semaphore = new(ConcurrentTaskLimit);
+
         internal class ObjectTaskState
         {
             public Guid Id { get; init; }
@@ -22,7 +24,7 @@ namespace ObjectEngine.objectPipelines.objectTreading
         private readonly ConcurrentQueue<Task<KeyValuePair<Guid, ObjectTaskState>>> PROCESSING_QUEUE = [];
         private readonly ConcurrentQueue<Func<Task<KeyValuePair<Guid, ObjectTaskState>>>> TASK_QUEUE = new();
         private readonly ConcurrentDictionary<Guid, ObjectTaskState> THREAD_POOL = [];
-        public async Task<ObjectThreader<TObject>> PoolObjectsAsync(Payload ObjectPayload,ObjManager<TObject> objManager, TaskCompletionSource<TObject> taskCompletionSource)
+        private protected async Task<ObjectThreader<TObject>> PoolAsync(ObjManager<TObject> objManager, Payload ObjectPayload, TaskCompletionSource<TObject> taskCompletionSource)
         {
             var TaskWrapper = IWrapObjects<TObject>.ObjectWrapper(objManager, ObjectPayload, taskCompletionSource);
             foreach (var ObjectWrappedTask in TaskWrapper)
@@ -36,7 +38,21 @@ namespace ObjectEngine.objectPipelines.objectTreading
             }
             return this;
         }
-        public async Task<ObjectThreader<TObject>> EnqueObjectsAsync()
+        private protected async Task<ObjectThreader<TObject>> PoolAsync(Guid Id, Payload ObjectPayload, TaskCompletionSource<TObject> taskCompletionSource)
+        {
+            var TaskWrapper = IWrapObjects<TObject>.ObjectWrapper(Id, ObjectPayload, taskCompletionSource);
+            foreach (var ObjectWrappedTask in TaskWrapper)
+            {   
+                var WrappedTask = await ObjectWrappedTask;
+                var IsAdded = THREAD_POOL.TryAdd(WrappedTask.Id, WrappedTask);
+                if (IsAdded)
+                {
+                    Console.WriteLine($"ObjectID: {WrappedTask.Id} ADDED TO: THREAD_POOL, Object Success Status: {WrappedTask.Success}");
+                }
+            }
+            return this;
+        }
+        private protected async Task<ObjectThreader<TObject>> EnqueAsync()
         {
             await Task.Run(() =>
             {
@@ -56,7 +72,7 @@ namespace ObjectEngine.objectPipelines.objectTreading
             });
             return this;
         }
-        public async Task<ObjectThreader<TObject>> ProcessObjectsAsync()
+        private protected async Task<ObjectThreader<TObject>> ProcessAsync()
         {
             await Task.Run(async () =>
             {
@@ -107,6 +123,7 @@ namespace ObjectEngine.objectPipelines.objectTreading
                         state.IsCompleted = true;
                         state.IsRunning = false;
                         _semaphore.Release();
+                        _semaphore.Dispose();
 
                         PROCESSED_OBJECTS.TryAdd(id, state);
                     }

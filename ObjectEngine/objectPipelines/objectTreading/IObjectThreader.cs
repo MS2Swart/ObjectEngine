@@ -24,6 +24,36 @@ namespace ObjectEngine.objectPipelines.objectTreading
             }
             return wrappedTask();
         }
+        private protected static IEnumerable<Task<ObjectThreader<TObject>.ObjectTaskState>> ObjectWrapper(Guid Id,ObjectThreader<TObject>.Payload payload, TaskCompletionSource<TObject> taskCompletionSource)
+        {
+
+                async Task<ObjectThreader<TObject>.ObjectTaskState> WrapObjectReturnTask()
+                {
+                    try
+                    {
+                        taskCompletionSource.SetResult(await payload());
+                        var NewInstance = new ObjectThreader<TObject>.ObjectTaskState()
+                        {
+                            Id = Id,
+                            Payload = payload,
+                            Success = true,
+                            IsProcessing = false,
+                            IsCompleted = false,
+                            IsRunning = false,
+                            CompletionSource = taskCompletionSource
+                        };
+                        return NewInstance;
+                    }
+                    catch (Exception ex)
+                    {
+                        taskCompletionSource.SetException(ex);
+                        throw;
+                    }
+                }
+                var WrapedObjectReturnTask = WrapObjectReturnTask();
+                yield return WrapedObjectReturnTask;
+
+        }
         private protected static IEnumerable<Task<ObjectThreader<TObject>.ObjectTaskState>> ObjectWrapper(ObjManager<TObject> objManager, ObjectThreader<TObject>.Payload payload,TaskCompletionSource<TObject> taskCompletionSource)
         {
             foreach(var (Id, PayloadObject, Success) in objManager.QUEUED_OBJECTS)

@@ -23,7 +23,7 @@ namespace ObjectEngine.objectPipelines.objectManager
         private protected ObjManager<TObject> Create()
         {
 
-                    (Guid Id, object CreatedObject, bool Success) OBJECT_INSTANCE_STORED = new();
+                    (Guid Id, object CreatedObject, bool Success) OBJECT_INSTANCE_STORED;
                     foreach (var OBJECT_INSTANCE in IManage.InitialCreationRunner(ICreate.SystemObject<TObject>(ICreate.SystemType<TObject>())))
                     {
                         var (Id, CreatedObject, Success) = AddObjectToDictionary(OBJECT_INSTANCE);
@@ -39,6 +39,24 @@ namespace ObjectEngine.objectPipelines.objectManager
                         }
 
                     }
+            return this;
+        }
+        private protected ObjManager<TObject> Create(Guid Guid)
+        {
+                (Guid Id, object CreatedObject, bool Success) OBJECT_INSTANCE_STORED;
+                var (Id, CreatedObject, Success) = AddObjectToDictionary(Guid, ICreate.SystemObject<TObject>(ICreate.SystemType<TObject>()));
+
+                if (Success == true && CreatedObject is not null)
+                {
+                    OBJECT_INSTANCE_STORED = (Id, CreatedObject, Success);
+                    var OBJECT_INSTANCE_STORED_TRASFORM = KeyValuePair.Create(OBJECT_INSTANCE_STORED.Id, (OBJECT_INSTANCE_STORED.CreatedObject, OBJECT_INSTANCE_STORED.Success));
+                    PASSED_OBJECTS.TryAdd(OBJECT_INSTANCE_STORED_TRASFORM.Key, OBJECT_INSTANCE_STORED_TRASFORM.Value);
+                }
+                else
+                {
+                    FAILED_OBJECTS.TryAdd(Id, (CreatedObject, Success));
+                }
+
             return this;
         }
 
@@ -79,6 +97,24 @@ namespace ObjectEngine.objectPipelines.objectManager
             catch (Exception ex)
             {
                 throw new OperationCanceledException($"Clear opperation canceled or could not finish, please see to ObjectEngine: {this.GetType().Name}",ex);
+            }
+            return this;
+        }
+
+        #endregion
+
+        #region UpdateChain
+
+        private protected ObjManager<TObject> Update(Guid Id ,object TargetObject)
+        {
+            var IsCompleted = PASSED_OBJECTS.TryGetValue(Id, out var ObjectData);
+            if (IsCompleted)
+            {
+                var IsUpdated = PASSED_OBJECTS.TryUpdate(Id,ObjectData,(TargetObject,IsCompleted));
+                if (IsUpdated)
+                {
+                    throw new Exception($"Update Failed: {nameof(TargetObject)} to {nameof(PASSED_OBJECTS)}, Completion Status: {IsCompleted}, Update Status: {IsUpdated}");
+                }
             }
             return this;
         }

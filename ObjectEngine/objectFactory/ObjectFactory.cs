@@ -43,6 +43,25 @@ namespace ObjectEngine.objectFactory
                 ObjectDictionary.Clear();
             }
         }
+        private protected (Guid Id, object CreatedObject, bool Success) AddObjectToDictionary(Guid Id,object createdObject)
+        {
+            try
+            {
+                var isSuccessful = ObjectDictionary.TryAdd(Id, createdObject);
+                var Result = (Id, createdObject, isSuccessful);
+                Console.WriteLine($"Object Factory: TEMP: ObjectToDictionary GUID: {Result.Id} OBJECT: {Result.createdObject} STATUS: {Result.isSuccessful}");
+                return Result;
+            }
+            catch (Exception ex)
+            {
+
+                throw new TypeInitializationException($"Could not add typeof({createdObject.GetType().Name}) to {ObjectDictionary.GetType().Name}", ex);
+            }
+            finally
+            {
+                ObjectDictionary.Clear();
+            }
+        }
         /// <summary>
         /// Removes the created object from dictionary by using the GUID type used for identification.
         /// </summary>

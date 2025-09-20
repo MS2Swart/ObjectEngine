@@ -10,8 +10,8 @@ namespace OECore.OESerialization
     /// <typeparam name="TObject"></typeparam>
     internal interface ISerializeObjects<TObject> where TObject : class, new()
     {
-        SerializationHelper<TObject> SerializeObject();
-        SerializationHelper<TObject> DeserializeObject();
+        SerializationHelper<TObject> SerializeObject(out List<string?> SerializedObject);
+        SerializationHelper<TObject> SerializeObject(Guid Id, object TargetObject, out string? SerializedObject);
     }
     /// <summary>
     /// ISubmitObjectSerializers Contracts: Provides Ready available collection Objects to Ready Available collection Queues.
@@ -19,8 +19,8 @@ namespace OECore.OESerialization
     /// <typeparam name="TObject"></typeparam>
     internal interface ISubmitObjectSerializers<TObject> where TObject : class, new()
     {
-        SerializationHelper<TObject> SubmitSerializableObject();
-        SerializationHelper<TObject> SubmitDeserializableObject();
+        SerializationHelper<TObject> DeserializeObject(out List<TObject> DeserializedObject);
+        SerializationHelper<TObject> DeserializeObject(Guid Id, string FORMATDATA, out TObject DeserializedObject);
     }
 
     #endregion

@@ -5,7 +5,7 @@ using System.Security.Cryptography;
 
 namespace OECore.OECryptography.AES
 {
-    public class AESCryptographyHelper<TObject>(SerializationHelper<TObject> objectSerializer) : ObjectAESCryptographer where TObject : class, new()
+    public class AESCryptographyHelper<TObject>(SerializationHelper<TObject> objectSerializer) : ObjectAESCryptographer, ICreateKey<TObject>, IEncrypt<TObject>, IDecrypt<TObject> where TObject : class, new()
     {
         private static readonly ConcurrentBag<Aes> RESTRICTEDKEY = [];
         private protected ConcurrentDictionary<Guid, byte[]> ENCRYPTED_OBJECTS = new();

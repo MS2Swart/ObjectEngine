@@ -1,4 +1,5 @@
-﻿using ObjectEngine.objectPipelines.objectManager;
+﻿using Microsoft.VisualBasic;
+using ObjectEngine.objectPipelines.objectManager;
 using System.Collections.Concurrent;
 using System.Runtime.Serialization;
 using System.Text.Json;
@@ -16,10 +17,13 @@ namespace ObjectEngine.objectPipelines.objectConverters.JSON.IO
         public ConcurrentQueue<(Guid Id, object DeserializedObject)> DESERIALIZED_QUEUED = new();
         private readonly ConcurrentDictionary<Guid, string> SERIALIZED_READY = new();
         private readonly ConcurrentDictionary<Guid, object> DESERIALIZED_READY = new();
-        private readonly ObjManager<TObject> ObjManager;
-        public ObjectSerializer(ObjManager<TObject> objectManager)
+        private readonly ObjManager<TObject>? ObjManager;
+        public ObjectSerializer(ObjManager<TObject>? objectManager = null)
         {
-            ObjManager = objectManager;
+            if (objectManager is not null)
+            {
+                ObjManager = objectManager;
+            }
         }
 
         /// <summary>
@@ -28,19 +32,63 @@ namespace ObjectEngine.objectPipelines.objectConverters.JSON.IO
         /// <remarks>This Chain Method will receive an expression tree for diffrent Serialization Format if needed.</remarks>
         /// <returns></returns>
         /// <exception cref="SerializationException"></exception>
-        private protected ObjectSerializer<TObject> Serialize()
+        private protected ObjectSerializer<TObject> Serialize(out List<string?> SerializedObjects)
         {
+             var _serializedObjects =new List<string?>();
             try
             {
+                if (ObjManager is null)
+                {
+                    throw new NullReferenceException($"Could not {nameof(Serialize)},Missing Depedency: {nameof(ObjManager)}");
+                }
                 Parallel.ForEach(ISerializableIterator.SerializableIterator(ObjManager), new ParallelOptions(){ MaxDegreeOfParallelism = Environment.ProcessorCount }, serializable => {
                     var serialized = JsonSerializer.Serialize((TObject)serializable.TargetObject);
+                    _serializedObjects.Add(serialized);
                     SERIALIZED_READY.TryAdd(serializable.Id, serialized);
                     Console.WriteLine($"[Serialize] Id={serializable.TargetObject} Type={typeof(TObject).Name} Json={serialized}");
                 });
+                SerializedObjects = _serializedObjects;
             }
             catch (Exception ex)
             {
                 throw new SerializationException("Object failed to serialize", ex);
+            }
+            return this;
+        }
+        private protected ObjectSerializer<TObject> Serialize(Guid Id,object TargetObject, out string? SerializedObject)
+        {
+            try
+            {
+                    var serialized = JsonSerializer.Serialize((TObject)TargetObject);
+                SerializedObject = serialized;
+                    SERIALIZED_READY.TryAdd(Id, serialized);
+                    Console.WriteLine($"[Serialize] Id={TargetObject} Type={typeof(TObject).Name} Json={serialized}");
+            }
+            catch (Exception ex)
+            {
+                throw new SerializationException("Object failed to serialize", ex);
+            }
+            return this;
+        }
+        private protected ObjectSerializer<TObject> Deserialize( out List<TObject> DeserializedObjects)
+        {
+            try
+            {
+                var deserializedObjects = new List<TObject>();
+                foreach (var (Id, SerializedObject) in SERIALIZED_QUEUED)
+                {
+                    var deserialized = JsonSerializer.Deserialize<TObject>(SerializedObject)
+                    ?? throw new IOException("Could not deserialize FORMAT_DATA to type T.");
+                    deserializedObjects.Add(deserialized);
+                                    DESERIALIZED_READY.TryAdd(Id, deserialized!);
+                                    Console.WriteLine($"[Deserialize] Id={Id} Type={typeof(TObject).Name} Obj={deserialized}");
+                }
+                DeserializedObjects = deserializedObjects;
+
+            }
+            catch (Exception ex)
+            {
+                throw new SerializationException("Object failed to deserialize", ex);
             }
             return this;
         }
@@ -52,13 +100,14 @@ namespace ObjectEngine.objectPipelines.objectConverters.JSON.IO
         /// <returns></returns>
         /// <exception cref="IOException"></exception>
         /// <exception cref="SerializationException"></exception>
-        private protected ObjectSerializer<TObject> Deserialize(Guid Id,string FORMATDATA)
+        private protected ObjectSerializer<TObject> Deserialize(Guid Id,string FORMATDATA,out TObject DeserializedObject)
         {
             try
             {
 
                     var deserialized = JsonSerializer.Deserialize<TObject>(FORMATDATA)
                         ?? throw new IOException("Could not deserialize FORMAT_DATA to type T.");
+                    DeserializedObject = deserialized;
                     DESERIALIZED_READY.TryAdd(Id, deserialized!);
                     Console.WriteLine($"[Deserialize] Id={Id} Type={typeof(TObject).Name} Obj={deserialized}");
 
